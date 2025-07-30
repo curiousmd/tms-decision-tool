@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+    <title>TMS Adolescent Decision Support Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .login-content {
+            padding: 40px;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .form-input {
+            padding: 12px 15px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.3);
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            display: none;
+            margin-top: 10px;
+        }
+
+        .main-app {
+            display: none;
+        }
+
+        .main-app.authenticated {
+            display: block;
+        }
+
+        .login-container.hidden {
+            display: none;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .question-card {
+            background: #f8f9ff;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4facfe;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .question-card.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .question-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            color: white;
+        }
+
+        .btn-yes:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(86, 171, 47, 0.3);
+        }
+
+        .btn-no {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            color: white;
+        }
+
+        .btn-no:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 65, 108, 0.3);
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .result-card.active {
+            display: block;
+        }
+
+        .result-success {
+            border-left: 5px solid #27ae60;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        }
+
+        .result-referral {
+            border-left: 5px solid #f39c12;
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        }
+
+        .result-reject {
+            border-left: 5px solid #e74c3c;
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        }
+
+        .result-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .result-success .result-title {
+            color: #155724;
+        }
+
+        .result-referral .result-title {
+            color: #856404;
+        }
+
+        .result-reject .result-title {
+            color: #721c24;
+        }
+
+        .result-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .result-actions {
+            background: rgba(255,255,255,0.7);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .result-actions h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .result-actions ul {
+            margin-left: 20px;
+        }
+
+        .result-actions li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #e0e6ed;
+            border-radius: 2px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            transition: width 0.5s ease;
+            border-radius: 2px;
+        }
+
+        .info-note {
+            background: #e8f4fd;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.95rem;
+            color: #0c5460;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .question-card {
+                padding: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-container" id="loginScreen">
+        <div class="login-header">
+            <h1>Secure Access</h1>
+            <p>Please enter your credentials to continue</p>
+        </div>
+        <div class="login-content">
+            <form class="login-form" onsubmit="authenticate(event)">
+                <div class="form-group">
+                    <label class="form-label" for="password">Password:</label>
+                    <input type="password" id="password" class="form-input" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="login-btn">Access Tool</button>
+                <div class="error-message" id="errorMessage">
+                    Incorrect password. Please try again.
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div class="container main-app" id="mainApp">
+        <div class="header">
+            <h1>TMS Adolescent Decision Support Tool</h1>
+            <p>Interactive screening and referral guidance system</p>
+        </div>
+        
+        <div class="content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <!-- Question 1: Adequate antidepressant trial -->
+            <div class="question-card active" id="q1">
+                <div class="question-title">
+                    Has the patient completed ≥1 adequate antidepressant trial?
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-yes" onclick="answer('q1', 'yes')">Yes</button>
+                    <button class="btn btn-no" onclick="answer('q1', 'no')">No</button>
+                </div>
+            </div>
+
+            <!-- Question 2: History of seizure -->
+            <div class="question-card" id="q2">
+                <div class="question-title">
+                    Is there any history of seizure?
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-yes" onclick="answer('q2', 'yes')">Yes</button>
+                    <button class="btn btn-no" onclick="answer('q2', 'no')">No</button>
+                </div>
+            </div>
+
+            <!-- Question 3: Prior adverse reaction to TMS -->
+            <div class="question-card" id="q3">
+                <div class="question-title">
+                    Is there any prior adverse reaction to TMS?
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-yes" onclick="answer('q3', 'yes')">Yes</button>
+                    <button class="btn btn-no" onclick="answer('q3', 'no')">No</button>
+                </div>
+            </div>
+
+            <!-- Question 4: Metal in head -->
+            <div class="question-card" id="q4">
+                <div class="question-title">
+                    Any metal in the head (excluding dental work) reported?
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-yes" onclick="answer('q4', 'yes')">Yes</button>
+                    <button class="btn btn-no" onclick="answer('q4', 'no')">No</button>
+                </div>
+            </div>
+
+            <!-- Question 5: Availability -->
+            <div class="question-card" id="q5">
+                <div class="question-title">
+                    Is the patient able to come to 401 Quarry 5 days a week for 6 weeks?
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-yes" onclick="answer('q5', 'yes')">Yes</button>
+                    <button class="btn btn-no" onclick="answer('q5', 'no')">No</button>
+                </div>
+            </div>
+
+            <!-- Question 6: Commitment to 3+ visits per week -->
+            <div class="question-card" id="q6">
+                <div class="question-title">
+                    Can patient commit to ≥3 visits/week?
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-yes" onclick="answer('q6', 'yes')">Yes</button>
+                    <button class="btn btn-no" onclick="answer('q6', 'no')">No</button>
+                </div>
+                <div class="info-note">
+                    <strong>Note:</strong> TMS therapy demonstrates significantly reduced efficacy when administered at frequencies below 3 sessions per week. Current clinical guidelines recommend maintaining ≥3x/week treatment protocols to achieve therapeutic benefit.
+                </div>
+            </div>
+
+            <!-- Results -->
+            <!-- Referral to Dr. Matout and Dr. Raj -->
+            <div class="result-card result-referral" id="result-referral">
+                <div class="result-title">🔄 Further Screening Required</div>
+                <div class="result-description">
+                    Based on the screening responses, this case requires specialist review.
+                </div>
+                <div class="result-actions">
+                    <h4>Next Steps:</h4>
+                    <ul>
+                        <li>Route referral to Dr. Matout and Dr. Raj</li>
+                        <li>Include all screening responses in referral documentation</li>
+                        <li>Indicate specific concern(s) identified during screening</li>
+                    </ul>
+                </div>
+                <button class="reset-btn" onclick="resetForm()">Start New Assessment</button>
+            </div>
+
+            <!-- Successful consultation -->
+            <div class="result-card result-success" id="result-success">
+                <div class="result-title">✅ Schedule Consultation</div>
+                <div class="result-description">
+                    Patient meets initial screening criteria for TMS therapy.
+                </div>
+                <div class="result-actions">
+                    <h4>Next Steps:</h4>
+                    <ul>
+                        <li>Confirm insurance coverage for consultation</li>
+                        <li>Schedule consultation (preferably with the Child Psychiatry Fellow in Interventional Psychiatry)</li>
+                        <li>Send PHQ-9 to patient along with consultation details</li>
+                    </ul>
+                </div>
+                <button class="reset-btn" onclick="resetForm()">Start New Assessment</button>
+            </div>
+
+            <!-- Rejection - inadequate treatment history -->
+            <div class="result-card result-reject" id="result-inadequate">
+                <div class="result-title">❌ TMS Not Recommended</div>
+                <div class="result-description">
+                    Patient has not completed adequate antidepressant trial(s). TMS is typically considered after failed medication trials.
+                </div>
+                <div class="result-actions">
+                    <h4>Next Steps:</h4>
+                    <ul>
+                        <li>Do not schedule consultation</li>
+                        <li>Inform patient of decision</li>
+                        <li>Consider referring back to prescribing physician for medication optimization</li>
+                        <li>Patient may be reconsidered after completing adequate medication trials</li>
+                    </ul>
+                </div>
+                <button class="reset-btn" onclick="resetForm()">Start New Assessment</button>
+            </div>
+
+            <!-- Rejection - frequency commitment -->
+            <div class="result-card result-reject" id="result-frequency">
+                <div class="result-title">❌ Cannot Proceed with TMS</div>
+                <div class="result-description">
+                    Patient cannot commit to the required treatment frequency. TMS needs 3+ weekly sessions to be effective.
+                </div>
+                <div class="result-actions">
+                    <h4>Next Steps:</h4>
+                    <ul>
+                        <li>Do not schedule a consultation</li>
+                        <li>Inform the patient that TMS therapy demonstrates significantly reduced efficacy when administered at frequencies below 3 sessions per week</li>
+                        <li>Explain that current clinical guidelines recommend maintaining ≥3x/week treatment protocols to achieve therapeutic benefit</li>
+                        <li>Patient may be reconsidered if schedule changes allow for adequate frequency</li>
+                    </ul>
+                </div>
+                <button class="reset-btn" onclick="resetForm()">Start New Assessment</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CORRECT_PASSWORD = "TMS2025";
+        
+        function authenticate(event) {
+            event.preventDefault();
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+            
+            if (password === CORRECT_PASSWORD) {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.add('authenticated');
+                // Clear the password field
+                document.getElementById('password').value = '';
+                errorMessage.style.display = 'none';
+            } else {
+                errorMessage.style.display = 'block';
+                document.getElementById('password').value = '';
+                document.getElementById('password').focus();
+            }
+        }
+
+        let currentQuestion = 1;
+        let answers = {};
+        const totalQuestions = 6;
+
+        function updateProgress() {
+            const progress = ((currentQuestion - 1) / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showQuestion(questionId) {
+            // Hide all questions and results
+            document.querySelectorAll('.question-card, .result-card').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Show current question
+            document.getElementById(questionId).classList.add('active');
+            updateProgress();
+        }
+
+        function showResult(resultId) {
+            // Hide all questions and results
+            document.querySelectorAll('.question-card, .result-card').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Show result
+            document.getElementById(resultId).classList.add('active');
+            
+            // Set progress to 100%
+            document.getElementById('progressFill').style.width = '100%';
+        }
+
+        function answer(questionId, response) {
+            answers[questionId] = response;
+
+            // Logic based on flowchart
+            switch(questionId) {
+                case 'q1':
+                    currentQuestion = 2;
+                    showQuestion('q2');
+                    break;
+
+                case 'q2':
+                    if (response === 'yes') {
+                        showResult('result-referral');
+                    } else {
+                        currentQuestion = 3;
+                        showQuestion('q3');
+                    }
+                    break;
+
+                case 'q3':
+                    if (response === 'yes') {
+                        showResult('result-referral');
+                    } else {
+                        currentQuestion = 4;
+                        showQuestion('q4');
+                    }
+                    break;
+
+                case 'q4':
+                    if (response === 'yes') {
+                        showResult('result-referral');
+                    } else {
+                        currentQuestion = 5;
+                        showQuestion('q5');
+                    }
+                    break;
+
+                case 'q5':
+                    if (response === 'no') {
+                        currentQuestion = 6;
+                        showQuestion('q6');
+                    } else {
+                        showResult('result-success');
+                    }
+                    break;
+
+                case 'q6':
+                    if (response === 'yes') {
+                        showResult('result-success');
+                    } else {
+                        showResult('result-frequency');
+                    }
+                    break;
+            }
+        }
+
+        function resetForm() {
+            currentQuestion = 1;
+            answers = {};
+            showQuestion('q1');
+        }
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>
